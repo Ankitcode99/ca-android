@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.text.Editable
 import android.util.Log
 import android.view.View
@@ -14,17 +13,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.example.consumeradda.R
-import com.example.consumeradda.models.caseModels.SubmitCaseDefaultResponse
-import com.example.consumeradda.models.caseModels.SubmitCaseModel
-import com.example.consumeradda.service.RetrofitClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_complaint_form.*
-import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 
 class ComplaintForm : AppCompatActivity() {
@@ -71,15 +63,13 @@ class ComplaintForm : AppCompatActivity() {
 
         mAuth=FirebaseAuth.getInstance()
         val curruser= mAuth.currentUser
-        val em=curruser?.email
-        etClientEmail.text=em?.toEditable()
+        val em=curruser?.email.toString()
+        etClientEmail.text=em.toEditable()
 
         mStorageRef = FirebaseStorage.getInstance().reference
 
         btnBack.setOnClickListener {
-            val intent = Intent(this, Dashboard::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            startActivity(intent)
+            finish()
         }
 
         val States = arrayOf("Select One:","Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chandigarh (UT)","Chhattisgarh","Dadra and Nagar Haveli (UT)","Daman and Diu (UT)","Delhi (NCT)","Goa","Gujarat","Haryana","Himachal Pradesh","Jammu and Kashmir","Jharkhand","Karnataka","Kerala","Lakshadweep (UT)","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Puducherry (UT)","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttarakhand","Uttar Pradesh","West Bengal")
@@ -1148,53 +1138,7 @@ class ComplaintForm : AppCompatActivity() {
     }
 
     private fun submitCase() {
-        val obj = SubmitCaseModel(
-                applicantFirstName = firstName,
-                applicantLastName = lastName,
-                contactNumber = phoneNumber,
-                district = city,
-                state = state,
-                caseAgainst = caseAgainst,
-                caseType = casetype,
-                caseOverview = caseOverview,
-                moneyInvolved = moneyInvolved.toInt(),
-                doc1 = attachment1DownloadableUrl,
-                doc2 = attachment2DownloadableUrl,
-                doc3 = attachment3DownloadableUrl,
-                doc4 = attachment4DownloadableUrl,
-                doc5 = attachment5DownloadableUrl
-        )
 
-        RetrofitClient.instance.caseService.submitApplication(obj)
-                .enqueue(object : Callback<SubmitCaseDefaultResponse> {
-                    override fun onResponse(
-                            call: Call<SubmitCaseDefaultResponse>,
-                            response: Response<SubmitCaseDefaultResponse>
-                    ) {
-                        if (response.isSuccessful) {
-                            Log.i(APPLICATIONSUBMITTAG, "success")
-                            toastMaker(response.body()?.message)
-                            Handler().postDelayed({
-                                toDashboardActivity()
-                            },3000)
-                        } else {
-                            val jObjError = JSONObject(response.errorBody()!!.string())
-                            Log.i(APPLICATIONSUBMITTAG, response.toString())
-                            Log.i(APPLICATIONSUBMITTAG, jObjError.getString("message"))
-                            toastMaker(jObjError.getString("message"))
-                            toDashboardActivity()
-                        }
-                    }
-
-                    override fun onFailure(call: Call<SubmitCaseDefaultResponse>, t: Throwable) {
-                        Log.i(APPLICATIONSUBMITTAG, "error" + t.message)
-                        toastMaker("Failed to Submit Application - " + t.message)
-                        pbSubmitCase.visibility=View.INVISIBLE
-                        btnSubmitCase.isEnabled = true
-                        btnSubmitCase.isClickable = true
-                        btnSubmitCase.text = "Submit"
-                    }
-                })
     }
 
     private fun toDashboardActivity() {
@@ -1211,8 +1155,6 @@ class ComplaintForm : AppCompatActivity() {
 
         firstName = etFirstName.text.toString()
         lastName = etLastName.text.toString()
-//        city = etCityDistrict.text.toString()
-//        state = etState.text.toString()
 
         caseAgainst = etCaseAgainst.text.toString()
         caseOverview = etCaseDescription.text.toString()

@@ -16,10 +16,7 @@ class Services : AppCompatActivity() {
 //        setSupportActionBar(toolbar)
 //        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         btnBackServices.setOnClickListener {
-            val intent = Intent(this, Dashboard::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            startActivity(intent)
-//            finish()
+            finish()
         }
     }
 }

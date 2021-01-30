@@ -10,9 +10,10 @@ import com.example.consumeradda.R
 
 import com.example.consumeradda.activities.OnCardClicked
 import com.example.consumeradda.models.cardModels.DashboardCardModel
+import com.example.consumeradda.models.caseModels.Case
 import kotlinx.android.synthetic.main.case_card.view.*
 
-class DashboardCardAdapter (private val context: Context, private val cardlist: ArrayList<DashboardCardModel>, private var onCardClicked: OnCardClicked): PagerAdapter()
+class DashboardCardAdapter (private val context: Context, private val cardlist: MutableList<Case>, private var onCardClicked: OnCardClicked): PagerAdapter()
 {
     override fun getCount(): Int {
         return cardlist.size
@@ -28,12 +29,36 @@ class DashboardCardAdapter (private val context: Context, private val cardlist: 
 
         val currentModel=cardlist[position]
 
-        val appNumber = currentModel.caseID
-        val clientName = currentModel.client
-        val lawyerName = currentModel.lawyer
+        val appNumber = currentModel.caseId.toString()
+        val clientName = currentModel.applicantFirstName+" "+currentModel.applicantLastName
+        val lawyerName = currentModel.lawyerName
         val caseType=currentModel.caseType
 
-        view.tvCardCaseIdHeader.text = appNumber
+        var type :String = ""
+
+        when(caseType)
+        {
+            "Consumer Protection Law"->{
+                type = "CPLAW"
+            }
+            "Banking Regulation"->{
+                type = "BLAW"
+            }
+            "Insurance Law"->{
+                type = "INSL"
+            }
+            "Debt Recovery"->{
+                type = "DEBT"
+            }
+            "RERA"->{
+                type = "RERA"
+            }
+            "Other"->{
+                type = "OTHER"
+            }
+        }
+
+        view.tvCardCaseIdHeader.text = "CA_${type}_${appNumber}"
         view.tvCardClientName.text = clientName
         view.tvCardLawyerName.text = lawyerName
         view.tvCardCaseType.text = caseType
@@ -43,7 +68,7 @@ class DashboardCardAdapter (private val context: Context, private val cardlist: 
             view.btnChat.visibility = View.VISIBLE
         }
 
-        when(currentModel.status)
+        when(currentModel.caseStatus)
         {
             0 ->
             {
@@ -70,19 +95,13 @@ class DashboardCardAdapter (private val context: Context, private val cardlist: 
 
         }
 
+        view.btnChat.setOnClickListener {
+            onCardClicked.onCardClicked(position)
+        }
 
         view.setOnClickListener{
 
-            if(lawyerName != "N/A")
-            {
-//                Toast.makeText(context,"$clientName's Application", Toast.LENGTH_SHORT).show()
-                onCardClicked.onCardClicked(position)
-            }
-            else{
-                Toast.makeText(context,"No lawyer has accepted\nyour case yet!",Toast.LENGTH_SHORT).show()
-            }
-
-//            Toast.makeText(context,"Case ID $appNumber", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context,"${view.tvCardCaseIdHeader.text}", Toast.LENGTH_SHORT).show()
         }
 
         container.addView(view, position)

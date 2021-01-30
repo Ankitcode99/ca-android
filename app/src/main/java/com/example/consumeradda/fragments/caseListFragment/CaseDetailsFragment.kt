@@ -48,27 +48,16 @@ class CaseDetailsFragment : Fragment() {
 
     private fun displayData() {
         tvCaseDetailRecipient.text = CasesListActivity.applicationList[CasesListActivity.selectedApplicationNumber].applicantFirstName+" "+CasesListActivity.applicationList[CasesListActivity.selectedApplicationNumber].applicantLastName
-        tvCaseDetailLocation.text = CasesListActivity.applicationList[CasesListActivity.selectedApplicationNumber].district+", "+CasesListActivity.applicationList[CasesListActivity.selectedApplicationNumber].state
+        tvCaseDetailLocation.text = CasesListActivity.applicationList[CasesListActivity.selectedApplicationNumber].applicantDistrict+", "+CasesListActivity.applicationList[CasesListActivity.selectedApplicationNumber].applicantState
         tvCaseDetailCaseAgainst.text = CasesListActivity.applicationList[CasesListActivity.selectedApplicationNumber].caseAgainst
         tvCaseDetailCaseType.text = CasesListActivity.applicationList[CasesListActivity.selectedApplicationNumber].caseType
-        tvCaseDetailMoneyInvolved.text = CasesListActivity.applicationList[CasesListActivity.selectedApplicationNumber].moneyInvolved.toString()
+        tvCaseDetailMoneyInvolved.text = CasesListActivity.applicationList[CasesListActivity.selectedApplicationNumber].caseMoney
         tvCaseDetailPurpose.text = CasesListActivity.applicationList[CasesListActivity.selectedApplicationNumber].caseDescription
     }
 
     private fun btnAcceptCaseSetOnClickListener() {
         btnAcceptCase.setOnClickListener {
-            btnAcceptCase.text = ""
-            pbAcceptCase.visibility = View.VISIBLE
-            btnAcceptCase.isEnabled = false
-            btnAcceptCase.isClickable = false
-            Handler().postDelayed({
-                btnAcceptCase.text = "Accept Case"
-                btnAcceptCase.isClickable = true
-                btnAcceptCase.isEnabled = true
-                Toast.makeText(context,"Work in progress!", Toast.LENGTH_LONG).show()
-                pbAcceptCase.visibility = View.INVISIBLE
-            },3500)
-//            Toast.makeText(this.context,"Ruko zara sabar karo",Toast.LENGTH_SHORT).show()
+            Toast.makeText(this.context,"Ruko zara sabar karo",Toast.LENGTH_SHORT).show()
         }
     }
 

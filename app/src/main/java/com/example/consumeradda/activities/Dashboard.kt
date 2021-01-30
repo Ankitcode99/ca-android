@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.AdapterView
@@ -16,44 +17,246 @@ import com.example.consumeradda.R
 import com.example.consumeradda.activities.support.About
 import com.example.consumeradda.activities.support.ContactUs
 import com.example.consumeradda.activities.support.Services
+import com.example.consumeradda.models.authModels.Register
 import com.example.shareapp.adapters.DashboardCardAdapter
 import com.example.consumeradda.models.cardModels.DashboardCardModel
+import com.example.consumeradda.models.caseModels.Case
+import com.example.consumeradda.service.AuthService
+import com.example.consumeradda.service.CaseService
+import com.example.consumeradda.service.ServiceBuilder
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.activity_about.view.*
 import kotlinx.android.synthetic.main.activity_complaint_form.*
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.forgot_password_dialog.*
 import kotlinx.android.synthetic.main.location_dialog.*
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class Dashboard : AppCompatActivity(), OnCardClicked {
 
     private lateinit var auth: FirebaseAuth
     private var isCardInfoDisplayed : Boolean = false
-    private lateinit var prefs: SharedPreferences
     private var cardPositionClicked : Int = -1
-    private lateinit var CardModelList: ArrayList<DashboardCardModel>
     private lateinit var cardAdapter: DashboardCardAdapter
-    var role = 0
+    var role : Int = 2
+    lateinit var currentUser : Register
+    private lateinit var CardModelList: MutableList<Case>
+//    val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
 
     companion object {
         var DASHBOARDTAG="DASHBOARDTAG"
-        var dataForLocationFrag=0 // 1 - state, 2 - district
         var state="State"
         var district="District"
         var stateNum=-1
         var districtNum=-1
-//        lateinit var locationDataModel:LocationDataModel
-//        lateinit var dashboardAPIResponse:DashboardDefaultResponse
-        var isDashboardAPIResponseInitialised=false
+        var fetchCases = false
         var cardPositionClicked=-1
+//        lateinit var CardModelList: MutableList<Case>
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
-        prefs=this.getSharedPreferences("com.example.consumeradda", Context.MODE_PRIVATE)
 
+        val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+        var fireId = sharedPreferences.getString("FIREBASE_ID",null)
+        role = sharedPreferences.getInt("ROLE",-1)
+        val verif = sharedPreferences.getBoolean("VERIFIED",false)
+        Log.d("VERIFY",verif.toString())
+//
+//
+        Log.d("FirebaseID",fireId)
+        Log.d("ROLES ",role.toString())
+
+        if(role==-1 || verif == false)
+        {
+            vpCardView.visibility = View.INVISIBLE
+
+            clSupporter.visibility = View.VISIBLE
+            pbSupport.visibility = View.VISIBLE
+            tvSupportMessage1.visibility = View.INVISIBLE
+            tvSupportMessage2.visibility = View.INVISIBLE
+            Log.d("AC99","Getting Data")
+            btnMore.isEnabled = false
+            complaint_btn.isEnabled = false
+            complaint_btn.visibility = View.INVISIBLE
+            cvCurrent.visibility = View.INVISIBLE
+            Toast.makeText(this,"Fetching user's data!",Toast.LENGTH_SHORT).show()
+
+            getDataFromDB(fireId.toString())
+        }
+        else
+        {
+            if(!fetchCases)
+            {
+                fetchCases = true
+                vpCardView.visibility = View.INVISIBLE
+                Log.d("HERE","Done")
+                clSupporter.visibility = View.VISIBLE
+                pbSupport.visibility = View.VISIBLE
+                tvSupportMessage1.visibility = View.INVISIBLE
+                tvSupportMessage2.visibility = View.INVISIBLE
+                btnMore.isEnabled = false
+                complaint_btn.visibility = View.INVISIBLE
+                cvCurrent.visibility = View.INVISIBLE
+
+
+                if(role==1)
+                {
+                    Toast.makeText(this,"Fetching User's Data",Toast.LENGTH_LONG).show()
+                    getDataFromDB(fireId.toString())
+                }else
+                {
+                    Toast.makeText(this,"Fetching Cases",Toast.LENGTH_LONG).show()
+                    getUserCases(fireId.toString())
+                }
+            }
+            else
+            {
+                Toast.makeText(this,"Activity CREATE",Toast.LENGTH_LONG).show()
+            }
+        }
+
+        complaint_btnSetOnClickListener()
+        btnMoreSetOnClickListener()
+        tvCardHeaderSetOnClickListener()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+        var fireId = sharedPreferences.getString("FIREBASE_ID",null)
+        role = sharedPreferences.getInt("ROLE",-1)
+        val verif = sharedPreferences.getBoolean("VERIFIED",false)
+        Log.d("VERIFY",verif.toString())
+//
+//
+        Log.d("FirebaseID",fireId)
+        Log.d("ROLES ",role.toString())
+        Log.d("PHASE","Resumed")
+
+        if(role==-1 || verif == false)
+        {
+            vpCardView.visibility = View.INVISIBLE
+
+            clSupporter.visibility = View.VISIBLE
+            pbSupport.visibility = View.VISIBLE
+            tvSupportMessage1.visibility = View.INVISIBLE
+            tvSupportMessage2.visibility = View.INVISIBLE
+
+            btnMore.isEnabled = false
+            complaint_btn.isEnabled = false
+            complaint_btn.visibility = View.INVISIBLE
+            cvCurrent.visibility = View.INVISIBLE
+
+            getDataFromDB(fireId.toString())
+        }
+        else
+        {
+            if(!fetchCases)
+            {
+                fetchCases = true
+                vpCardView.visibility = View.INVISIBLE
+                Log.d("HERE","Done")
+                clSupporter.visibility = View.VISIBLE
+                pbSupport.visibility = View.VISIBLE
+                tvSupportMessage1.visibility = View.INVISIBLE
+                tvSupportMessage2.visibility = View.INVISIBLE
+                btnMore.isEnabled = false
+                complaint_btn.visibility = View.INVISIBLE
+                cvCurrent.visibility = View.INVISIBLE
+
+                if(role==1)
+                {
+                    Toast.makeText(this,"Fetching User's Data",Toast.LENGTH_SHORT).show()
+                    getDataFromDB(fireId.toString())
+                }else
+                {
+                    Toast.makeText(this,"Fetching Cases",Toast.LENGTH_SHORT).show()
+                    getUserCases(fireId.toString())
+                }
+            }
+            else
+            {
+                cvCurrent.visibility = View.INVISIBLE
+                complaint_btn.visibility = View.INVISIBLE
+                clSupporter.visibility = View.VISIBLE
+                pbSupport.visibility = View.VISIBLE
+                tvSupportMessage1.visibility = View.INVISIBLE
+                tvSupportMessage2.visibility = View.INVISIBLE
+                Toast.makeText(this,"Fetching Cases",Toast.LENGTH_SHORT).show()
+                getUserCases(fireId.toString())
+            }
+        }
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+
+        val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+        var fireId = sharedPreferences.getString("FIREBASE_ID",null)
+        role = sharedPreferences.getInt("ROLE",-1)
+        val verif = sharedPreferences.getBoolean("VERIFIED",false)
+        Log.d("VERIFY",verif.toString())
+//
+//
+        Log.d("FirebaseID",fireId)
+        Log.d("ROLES ",role.toString())
+
+        if(role==-1 || verif == false)
+        {
+            vpCardView.visibility = View.INVISIBLE
+
+            clSupporter.visibility = View.VISIBLE
+            pbSupport.visibility = View.VISIBLE
+            tvSupportMessage1.visibility = View.INVISIBLE
+            tvSupportMessage2.visibility = View.INVISIBLE
+
+            btnMore.isEnabled = false
+            complaint_btn.isEnabled = false
+            complaint_btn.visibility = View.INVISIBLE
+            cvCurrent.visibility = View.INVISIBLE
+
+            getDataFromDB(fireId.toString())
+        }
+        else
+        {
+            if(!fetchCases)
+            {
+                fetchCases = true
+                vpCardView.visibility = View.INVISIBLE
+                Log.d("HERE","Done")
+                clSupporter.visibility = View.VISIBLE
+                pbSupport.visibility = View.VISIBLE
+                tvSupportMessage1.visibility = View.INVISIBLE
+                tvSupportMessage2.visibility = View.INVISIBLE
+                btnMore.isEnabled = false
+                complaint_btn.visibility = View.INVISIBLE
+                cvCurrent.visibility = View.INVISIBLE
+
+                if(role==1)
+                {
+                    Toast.makeText(this,"Fetching User's Data",Toast.LENGTH_SHORT).show()
+                    getDataFromDB(fireId.toString())
+                }else
+                {
+                    Toast.makeText(this,"Fetching Cases",Toast.LENGTH_SHORT).show()
+                    getUserCases(fireId.toString())
+                }
+            }
+            else
+            {
+                Toast.makeText(this,"Activity RESTART",Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun complaint_btnSetOnClickListener() {
         complaint_btn.setOnClickListener {
             if(complaint_btn.text.toString() == "Submit Complaint")
             {
@@ -63,23 +266,121 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
             {
                 startActivity(Intent(this,CasesListActivity::class.java))
             }
+            else
+            {
+                val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+                val naam = sharedPreferences.getString("NAME","").toString()
+                auth = FirebaseAuth.getInstance()
+                val email = auth.currentUser?.email
+                val intent = Intent(Intent.ACTION_SEND)
+                val recipients = arrayOf("consumersadda@gmail.com")
+                intent.putExtra(Intent.EXTRA_EMAIL, recipients)
+                intent.putExtra(Intent.EXTRA_SUBJECT,"Identity Verification Request")
+                intent.putExtra(Intent.EXTRA_TEXT, "Dear Admin,\n\nThis is an identity verification request mail from ${naam}.\nMy registered email address is\n\n${email}\n\n Looking for a positive response from your end.\n\nRegards,\n ${naam}")
+
+                intent.type = "text/html"
+                intent.setPackage("com.google.android.gm")
+                startActivity(Intent.createChooser(intent, "Send mail"))
+            }
         }
+    }
 
-        role = prefs.getInt("Role", 0)
+    private fun getDataFromDB(fireId: String) {
 
-        // Role 0 - Client
-        // Role 1 - Lawyer
-        complaint_btn.isEnabled = false
-        complaint_btn.isClickable = false
-        Toast.makeText(this,"$role",Toast.LENGTH_SHORT).show()
+//        pbSupport.visibility = View.INVISIBLE
+//        btnMore.isEnabled = true
+//        return;
+//
+//
+        val authService = ServiceBuilder.buildService(AuthService::class.java)
+        val requestCall = authService.getUserData(fireId)
+        requestCall.enqueue(object: Callback<List<Register>> {
+            override fun onResponse(call: Call<List<Register>>, response: Response<List<Register>>)
+            {
+                if(response.isSuccessful)
+                {
+                    if(response.body()!!.size!=0)
+                    {
+                        currentUser = response.body()!!.get(0)
 
-        Handler().postDelayed({
-            updateDashboard()
-        },1500)
+                        role = if(currentUser.isLawyer) {
+                            1
+                        } else {
+                            0
+                        }
+                        val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+                        val editor = sharedPreferences.edit()
+                        editor.apply {
+                                putInt("ROLE",role)
+                                putBoolean("VERIFIED",currentUser.isVerified)
+                                putString("NAME",currentUser.name)
+                                putString("FIREBASE_ID",currentUser.firebaseId)
+                            }.apply()
+                        var temp = sharedPreferences.getInt("ROLE",5)
+                        Log.d("TEMP",temp.toString())
+                        if(currentUser.isVerified)
+                        {
+                            fetchCases = true
+                            Toast.makeText(this@Dashboard,"Fetching Cases",Toast.LENGTH_SHORT).show()
+                            getUserCases(currentUser.firebaseId)
+                        }
+                        else
+                        {
+                            pbSupport.visibility = View.INVISIBLE
+                            tvSupportMessage1.visibility = View.VISIBLE
+                            btnMore.isEnabled = true
+                            tvSupportMessage2.visibility = View.VISIBLE
+                            complaint_btn.visibility = View.VISIBLE
+                            val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+                            val naam = sharedPreferences.getString("NAME","").toString()
+                            tvSupportMessage1.text = "Hello $naam !"
+                            tvSupportMessage2.text = "Kindly verify your identity to\nget started with Consumer Adda!"
+                            complaint_btn.text = "Request Verification!"
+                            complaint_btn.isEnabled = true
+//                            updateDashboard()
+                        }
+                    }
 
-        loadcards()
-        btnMoreSetOnClickListener()
-        tvCardHeaderSetOnClickListener()
+                }
+                else
+                {
+                    val jObjError = JSONObject(response.errorBody()!!.string())
+                    Toast.makeText(this@Dashboard,"${jObjError.getString("msg")}",Toast.LENGTH_LONG).show()
+                }
+            }
+            override fun onFailure(call: Call<List<Register>>, t: Throwable) {
+                Toast.makeText(this@Dashboard,"No Internet / Server Down",Toast.LENGTH_SHORT).show()
+            }
+        })
+
+    }
+
+    private fun getUserCases(fireId:String)
+    {
+        val caseService = ServiceBuilder.buildService(CaseService::class.java)
+        val requestCall = caseService.fetchCases(fireId)
+        requestCall.enqueue(object: Callback<MutableList<Case>>{
+            override fun onResponse(call: Call<MutableList<Case>>, response: Response<MutableList<Case>>) {
+                if(response.isSuccessful)
+                {
+                    CardModelList = response.body()!!
+                    updateDashboard()
+                }
+                else
+                {
+                    pbSupport.visibility = View.INVISIBLE
+                    tvSupportMessage1.visibility = View.VISIBLE
+                    tvSupportMessage1.text = "Please restart the app!"
+                    val jObjError = JSONObject(response.errorBody()!!.string())
+                    Toast.makeText(this@Dashboard,"${jObjError.getString("msg")}",Toast.LENGTH_LONG).show()
+                }
+            }
+
+            override fun onFailure(call: Call<MutableList<Case>>, t: Throwable) {
+                Toast.makeText(this@Dashboard,"No Internet / Server Error",Toast.LENGTH_LONG).show()
+            }
+
+        })
     }
 
     private fun tvCardHeaderSetOnClickListener() {
@@ -974,6 +1275,14 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                 }
 
                 mDialog.btnUpdateLocation.setOnClickListener {
+
+                    val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+                    val editor = sharedPreferences.edit()
+                    editor.apply{
+                        putString("DISTRICT", district)
+                        putString("STATE", state)
+                    }
+
                     tvCardData.text = "${district}, ${state}"
                     mDialog.dismiss()
                 }
@@ -981,42 +1290,101 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
         }
     }
 
-    private fun updateDashboard() {
-
-        complaint_btn.isEnabled = true
-        complaint_btn.isClickable = true
-
-        if(role!=0)
+    private fun updateDashboard()
+    {
+        btnMore.isEnabled = true
+        if(role==0)
         {
-            tvCardHeader.text = "Case Status"
-            tvCardData.text = "Notice Sent"
-//            if(CardModelList.size >= 1)
+            if(CardModelList.size != 0)
             {
+                clSupporter.visibility = View.INVISIBLE
+                vpCardView.visibility = View.VISIBLE
+                loadcards()
                 complaint_btn.visibility = View.INVISIBLE
+                cvCurrent.visibility = View.VISIBLE
+                tvCardHeader.text = "Case Status"
+
+                when(CardModelList[0].caseStatus)
+                {
+                    0->{
+                        tvCardData.text = "Case Logged"
+                    }
+                    1->{
+                        tvCardData.text = "Mediation Initiated"
+                    }
+                    2->{
+                        tvCardData.text = "Legal Notice Sent"
+                    }
+                    3->{
+                        tvCardData.text = "Case Filed in Court"
+                    }
+                }
             }
-//            else
+            else
             {
+                clSupporter.visibility = View.VISIBLE
+                tvSupportMessage1.visibility = View.VISIBLE
+                tvSupportMessage2.visibility = View.VISIBLE
+                tvSupportMessage1.text = "Welcome!"
+                tvSupportMessage2.text = "Got any legal issue?\nSubmit your case below."
+                pbSupport.visibility = View.INVISIBLE
+                cvCurrent.visibility = View.INVISIBLE
+                complaint_btn.isEnabled = true
+                complaint_btn.visibility = View.VISIBLE
                 complaint_btn.text = "Submit Complaint"
             }
         }
         else
         {
-            tvCardHeader.text = "Location Selected"
-            state = "Uttar Pradesh"
-            district = "Agra"
-            tvCardData.text = "${district}, ${state}"
             complaint_btn.text = "Cases List"
+            complaint_btn.isEnabled = true
+            complaint_btn.visibility = View.VISIBLE
+
+            if(CardModelList.size!=0)
+            {
+                clSupporter.visibility = View.INVISIBLE
+                vpCardView.visibility = View.VISIBLE
+                loadcards()
+                cvCurrent.visibility = View.VISIBLE
+                tvCardHeader.text = "Location Selected"
+                val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+                state = sharedPreferences.getString("STATE","Select One:").toString()
+                district = sharedPreferences.getString("DISTRICT","Select One:").toString()
+                tvCardData.text = "${district}, ${state}"
+            }
+            else
+            {
+                clSupporter.visibility = View.VISIBLE
+                pbSupport.visibility = View.INVISIBLE
+                tvSupportMessage1.visibility = View.VISIBLE
+                tvSupportMessage2.visibility = View.VISIBLE
+                val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+                val verif = sharedPreferences.getBoolean("VERIFIED",false)
+                val naam = sharedPreferences.getString("NAME","").toString()
+                if(verif)
+                {
+                    tvSupportMessage1.text = "Hello $naam !"
+                    tvSupportMessage2.text = "Start your start journey with\nus by accepting case from our\ncases list."
+                    tvCardHeader.text = "Location Selected"
+                    val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+                    state = sharedPreferences.getString("STATE","Select One:").toString()
+                    district = sharedPreferences.getString("DISTRICT","Select One:").toString()
+                    tvCardData.text = "${district}, ${state}"
+                    cvCurrent.visibility = View.VISIBLE
+                }
+                else
+                {
+                    tvSupportMessage1.text = "Hello $naam !"
+                    tvSupportMessage2.text = "Kindly verify your identity to\nget started with Consumer Adda!"
+                    complaint_btn.text = "Request Verification!"
+                }
+            }
+
         }
     }
 
     private fun loadcards()
     {
-        CardModelList = ArrayList()
-
-        CardModelList.add(DashboardCardModel("CA_RERA_1","Abhi","Vatsal","RERA",2))
-        CardModelList.add(DashboardCardModel("CA_OTHER_1","Ankit","Abhishek","Other",1))
-        CardModelList.add(DashboardCardModel("CA_RERA_2","Raju","Rasmeet","RERA",3))
-        CardModelList.add(DashboardCardModel("CA_BLAW_1","Humraz","N/A","Banking Law",0))
 
         vpCardView.adapter = DashboardCardAdapter(this,CardModelList,this)
 
@@ -1049,19 +1417,27 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
     
     private fun doSignOut()
     {
-        prefs.edit().putBoolean("isLoggedIn", false).apply()
+        val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.apply {
+            putInt("ROLE",-1)
+            putString("FIREBASE_ID",null)
+            putBoolean("LOGGED_IN",false)
+            putString("NAME",null)
+            putString("DISTRICT",null)
+            putString("STATE",null)
+        }.apply()
         FirebaseAuth.getInstance().signOut()
         val intent = Intent(this, LoginActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(intent)
-        finish()
     }
 
     override fun onCardClicked(position: Int) {
-        if(CardModelList[position].lawyer != "N/A")
+        if(CardModelList[position].lawyerName != "N/A")
         {
             val intent = Intent(this,ChatActivity::class.java)
-            intent.putExtra("Client",CardModelList[position].client)
+            intent.putExtra("Client",CardModelList[position].applicantFirstName+" "+CardModelList[position].applicantLastName)
             startActivity(intent)
         }
     }

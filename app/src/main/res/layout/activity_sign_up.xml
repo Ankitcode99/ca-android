@@ -191,6 +191,18 @@
                 app:layout_constraintTop_toBottomOf="@id/tvRoleMsg"
                 />
 
+            <ProgressBar
+                android:id="@+id/pbSignUp"
+                app:layout_constraintTop_toTopOf="@id/btnSignup"
+                app:layout_constraintBottom_toBottomOf="@id/btnSignup"
+                app:layout_constraintStart_toStartOf="@id/btnSignup"
+                app:layout_constraintEnd_toEndOf="@id/btnSignup"
+                android:layout_width="wrap_content"
+                android:progressDrawable="@drawable/progress_bar_style"
+                android:visibility="invisible"
+                android:elevation="40dp"
+                android:layout_height="wrap_content"/>
+
             <Button
                 android:id="@+id/btnSignup"
                 android:layout_width="wrap_content"

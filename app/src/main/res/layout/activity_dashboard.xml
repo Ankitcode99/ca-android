@@ -3,19 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="#ffffff"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:backgroundTint="#FFFFFF"
     tools:context=".activities.Dashboard">
 
     <TextView
         android:id="@+id/tvWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/black"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="30dp"
         android:text="Dashboard"
+        android:textColor="@color/black"
         android:textSize="35dp"
-        android:layout_marginLeft="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,29 +25,92 @@
         android:id="@+id/vpCardView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintHeight_percent=".40"
         android:layout_marginTop="12dp"
         android:clipToPadding="true"
-        android:overScrollMode="never"
+        android:visibility="visible"
         android:foregroundGravity="center"
-        app:layout_constraintTop_toBottomOf="@id/tvWelcome"
-        />
+        android:overScrollMode="never"
+        app:layout_constraintHeight_percent=".40"
+        app:layout_constraintTop_toBottomOf="@id/tvWelcome" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clSupporter"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@id/vpCardView"
+        app:layout_constraintTop_toTopOf="@id/vpCardView">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvSupporter"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="15dp"
+            android:elevation="15dp"
+            app:cardBackgroundColor="#85E3E3E3"
+            app:cardCornerRadius="20dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/tvSupportMessage1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="95dp"
+                    android:gravity="center_horizontal"
+                    android:text="Support Text"
+                    android:textColor="#E1000000"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvSupportMessage2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="105dp"
+                    android:gravity="center_horizontal"
+                    android:text="Support Text2"
+                    android:textColor="#E1000000"
+                    android:textSize="16sp"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintTop_toBottomOf="@id/tvSupportMessage1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <ProgressBar
+                    android:id="@+id/pbSupport"
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
+                    android:indeterminateTint="#03A9F4"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cvCurrent"
-        android:backgroundTint="#e2e2e2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="20dp"
-        android:elevation="3dp"
-        android:visibility = "visible"
         android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
         android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@id/vpCardView"
+        android:layout_marginRight="30dp"
+        android:backgroundTint="#e2e2e2"
+        android:elevation="3dp"
+        android:visibility="visible"
+        app:cardCornerRadius="20dp"
         app:layout_constraintBottom_toTopOf="@id/complaint_btn"
-        >
+        app:layout_constraintTop_toBottomOf="@id/vpCardView">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -55,42 +119,39 @@
                 android:id="@+id/tvCardHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:text="Card Header"
-                android:textSize="25sp"
-                android:textColor="#5896d6"
                 android:layout_marginTop="15dp"
-                />
+                android:text="Card Header"
+                android:textColor="#5896d6"
+                android:textSize="25sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <View
                 android:id="@+id/vSep"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#a9a9a9"
-                android:layout_marginRight="15dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="15dp"
-                app:layout_constraintTop_toBottomOf="@id/tvCardHeader"
+                android:layout_marginRight="15dp"
+                android:background="#a9a9a9"
                 app:layout_constraintBottom_toTopOf="@id/tvCardData"
-                />
+                app:layout_constraintTop_toBottomOf="@id/tvCardHeader" />
 
             <TextView
                 android:id="@+id/tvCardData"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
                 android:layout_marginTop="15dp"
-
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="15dp"
+                android:gravity="center_horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:text="Case Last Status / Selected Location's State and District/City"
                 android:textColor="#585858"
                 android:textSize="22sp"
-                android:gravity="center_horizontal"
-                android:layout_marginRight="15dp"
-                android:layout_marginLeft="15dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:layout_marginBottom="15dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/vSep"
                 tools:layout_editor_absoluteX="15dp" />
@@ -103,21 +164,20 @@
         android:id="@+id/complaint_btn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:background="@drawable/btn_bg"
-        android:paddingLeft="30dp"
-        android:backgroundTint="#5896d6"
-        android:paddingRight="30dp"
         android:layout_marginTop="20dp"
-        android:textColor="#ffffff"
-        android:textAllCaps="false"
-        android:textSize="18sp"
+        android:background="@drawable/btn_bg"
+        android:backgroundTint="#5896d6"
+        android:paddingLeft="30dp"
+        android:paddingTop="10dp"
+        android:paddingRight="30dp"
+        android:paddingBottom="10dp"
         android:text="Submit Complaint"
-        app:layout_constraintTop_toBottomOf="@id/cvCurrent"
+        android:textAllCaps="false"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="@id/cvCurrent"
         app:layout_constraintStart_toStartOf="@id/cvCurrent"
-        />
+        app:layout_constraintTop_toBottomOf="@id/cvCurrent" />
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -126,11 +186,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:layout_marginRight="20dp"
-        android:src="@drawable/ic_baseline_info_24"
         android:background="@android:color/transparent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
+        android:src="@drawable/ic_baseline_info_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

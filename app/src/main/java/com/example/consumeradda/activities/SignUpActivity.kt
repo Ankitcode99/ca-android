@@ -4,21 +4,22 @@ package com.example.consumeradda.activities
 
 import android.app.Dialog
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
+import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import com.example.consumeradda.R
 import com.example.consumeradda.models.authModels.Register
 import com.example.consumeradda.models.authModels.RegisterDefaultResponse
-import com.example.consumeradda.service.RetrofitClient
+import com.example.consumeradda.service.AuthService
+import com.example.consumeradda.service.ServiceBuilder
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import kotlinx.android.synthetic.main.lawyer_phone_dialog.*
-import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -27,7 +28,8 @@ class SignUpActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private var role = -1
-    private var lawyerPhoneNumber: String = ""
+    private var lawyer:Boolean = false
+    private var PhoneNumber: String = ""
     private var SIGNUPFRAGTAG="SIGNUP-TAG"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,75 +104,106 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun doSignUp() {
-        val userName = etSignUpName.text.toString().trim()
         val userEmail = etSignUpEmail.text.toString().trim()
         val userPassword = etSignUpPassword.text.toString().trim()
 
-        val obj = Register(userName,userEmail,userPassword,role,lawyerPhoneNumber)
+        setState(false)
 
-        val progress= ProgressDialog(this, R.style.AlertDialogTheme)
-        progress.setMessage("Signing Up...")
-        progress.setCancelable(false)
-        progress.show()
+        pbSignUp.visibility = View.VISIBLE
+        auth.createUserWithEmailAndPassword(userEmail, userPassword)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful)
+                {
+                    val user = auth.currentUser
+                    user?.sendEmailVerification()
+                        ?.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val fid = user.uid
+                                saveToDB(fid)
+                            }
+                            else
+                            {
+                                setState(b = true)
+                                Toast.makeText(baseContext, "Sign-Up failed.Try again after sometime",
+                                    Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                }
+                else
+                {
+                    setState(b = true)
+                    pbSignUp.visibility = View.INVISIBLE
+                    Toast.makeText(baseContext, "This email is already in use",
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
 
-        RetrofitClient.instance.authService.registerUser(obj).enqueue(object :
-            Callback<RegisterDefaultResponse> {
+    private fun setState(b: Boolean) {
+        etSignUpName.isEnabled = b
+        etSignUpEmail.isEnabled = b
+        etSignUpPassword.isEnabled = b
+        rbClient.isEnabled = b
+        rbLawyer.isEnabled = b
+        btnSignup.isEnabled = b
+        if(b)
+        {
+            btnSignup.text = "SIGNUP"
+        }
+        else{
+            btnSignup.text=""
+        }
+    }
+
+    private fun saveToDB(fid: String) {
+        val userName = etSignUpName.text.toString().trim()
+        val userEmail = etSignUpEmail.text.toString().trim()
+
+        val verified = !lawyer
+
+        val newUser = Register(userName,userEmail,fid,PhoneNumber,lawyer,verified)
+
+        val authService = ServiceBuilder.buildService(AuthService::class.java)
+
+        val requestCall = authService.registerUser(newUser)
+
+        requestCall.enqueue(object : Callback<RegisterDefaultResponse>{
             override fun onResponse(
                 call: Call<RegisterDefaultResponse>,
                 response: Response<RegisterDefaultResponse>
             ) {
-                if (response.isSuccessful) {
-                    Log.i(SIGNUPFRAGTAG, response.toString())
-                    Log.i(SIGNUPFRAGTAG, response.body()!!.verify_link)
-                    toastMaker(response.body()?.message.toString())
-                    progress.dismiss()
-                } else {
-                    Log.i(SIGNUPFRAGTAG, response.toString())
-                    val jObjError = JSONObject(response.errorBody()!!.string())
-                    Log.i(SIGNUPFRAGTAG, jObjError.getString("message"))
-                    toastMaker("SignUp failed - "+jObjError.getString("message"))
-                    progress.dismiss()
+                if(response.isSuccessful)
+                {
+
+                    val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+                    val editor = sharedPreferences.edit()
+                    editor.apply {
+                        putBoolean("VERIFIED",verified)
+                    }
+
+                    val msg = response.body()!!.msg
+                    Toast.makeText(this@SignUpActivity,"${msg}",Toast.LENGTH_SHORT).show()
+                    Handler().postDelayed({
+                        val intent = Intent(this@SignUpActivity, LoginActivity::class.java)
+                        startActivity(intent)
+                    },2000)
                 }
+                else
+                {
+                    Toast.makeText(this@SignUpActivity,"${response.body()!!.msg}",Toast.LENGTH_SHORT).show()
+                }
+                pbSignUp.visibility = View.INVISIBLE
             }
 
             override fun onFailure(call: Call<RegisterDefaultResponse>, t: Throwable) {
-                Log.i(SIGNUPFRAGTAG, t.message)
-                toastMaker("No Internet / Server Down")
+                pbSignUp.visibility = View.INVISIBLE
+                Toast.makeText(this@SignUpActivity,"No Internet / Server Down",Toast.LENGTH_SHORT).show()
             }
+
         })
 
-
-//        auth.createUserWithEmailAndPassword(userEmail, userPassword)
-//            .addOnCompleteListener(this) { task ->
-//                if (task.isSuccessful)
-//                {
-//                    progress.dismiss()
-//                    val user = auth.currentUser
-//                    user?.sendEmailVerification()
-//                        ?.addOnCompleteListener { task ->
-//                            if (task.isSuccessful) {
-//                                startActivity(Intent(this, LoginActivity::class.java))
-//                                finish()
-//                            }
-//                            else
-//                            {
-//                                Toast.makeText(baseContext, "Sign-Up failed.Try again after sometime",
-//                                    Toast.LENGTH_SHORT).show()
-//                            }
-//                        }
-//                }
-//                else
-//                {
-//                    progress.dismiss()
-//                    Toast.makeText(baseContext, "Sign-Up failed.Try again after sometime",
-//                        Toast.LENGTH_SHORT).show()
-//                }
-//            }
     }
 
-    private fun toastMaker(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
 
     private fun getPhoneNumber() {
         val mDialog = Dialog(this)
@@ -185,7 +218,7 @@ class SignUpActivity : AppCompatActivity() {
         mDialog.show()
         mDialog.btnPhoneSubmit.setOnClickListener {
             if(mDialog.etLawyerPhoneNumber.text.toString().length == 10) {
-                lawyerPhoneNumber = mDialog.etLawyerPhoneNumber.text.toString()
+                PhoneNumber = mDialog.etLawyerPhoneNumber.text.toString()
                 mDialog.dismiss()
                 doSignUp()
             }
@@ -197,6 +230,7 @@ class SignUpActivity : AppCompatActivity() {
     private fun rbLawyerSetOnClickListener() {
         rbLawyer.setOnClickListener {
             role = 1
+            lawyer = true
             rbLawyer.isChecked = true
             rbClient.isChecked = false
         }
@@ -205,6 +239,7 @@ class SignUpActivity : AppCompatActivity() {
     private fun rbClientSetOnClickListener() {
         rbClient.setOnClickListener {
             role = 0
+            lawyer = false
             rbClient.isChecked = true
             rbLawyer.isChecked = false
         }

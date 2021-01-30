@@ -8,11 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.consumeradda.R
 import com.example.consumeradda.fragments.caseListFragment.OnApplicationClicked
 
-import com.example.consumeradda.models.cardModels.ApplicationCardModel
-import com.example.consumeradda.models.caseModels.CaseResponse
+import com.example.consumeradda.models.caseModels.Case
 import kotlinx.android.synthetic.main.application_list_card.view.*
 
-class ApplicationListAdapter(private var entries: MutableList<CaseResponse>, private var onCaseClicked: OnApplicationClicked) : RecyclerView.Adapter<ApplicationListAdapter.ViewHolder>()
+class ApplicationListAdapter(private var entries: MutableList<Case>, private var onCaseClicked: OnApplicationClicked) : RecyclerView.Adapter<ApplicationListAdapter.ViewHolder>()
 {
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
     {
@@ -21,7 +20,7 @@ class ApplicationListAdapter(private var entries: MutableList<CaseResponse>, pri
         val caseType : TextView = itemView.tvAppListCaseType
     }
 
-    fun updateList(updatedList: MutableList<CaseResponse>)
+    fun updateList(updatedList: MutableList<Case>)
     {
         entries = updatedList
         notifyDataSetChanged()
@@ -36,7 +35,7 @@ class ApplicationListAdapter(private var entries: MutableList<CaseResponse>, pri
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val client = entries[position].applicantFirstName+" "+entries[position].applicantLastName
-        val location = entries[position].district+", "+entries[position].state
+        val location = entries[position].applicantDistrict+", "+entries[position].applicantState
         val type = entries[position].caseType
 
         holder.clientName.text = client

@@ -8,13 +8,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionInflater
 import com.example.consumeradda.R
 import com.example.consumeradda.activities.CasesListActivity
 import com.example.consumeradda.activities.Dashboard
-import com.example.consumeradda.models.caseModels.CaseResponse
 import com.example.shareapp.adapters.ApplicationListAdapter
 import kotlinx.android.synthetic.main.case_type_filter.*
 import kotlinx.android.synthetic.main.fragment_cases_list.*
@@ -85,20 +83,15 @@ class CasesListFragment : Fragment(), OnApplicationClicked {
     }
 
     private fun getApplications() {
-        var tempList = mutableListOf<CaseResponse>()
-        tempList.add(CaseResponse("CA_RERA_1","Kerala","Trivandrumpuram","Rajeev","Singh","RERA","Mr. Vinod Singh","Illegal kabzaa on my property",1200000,"","","","","",""))
-        tempList.add(CaseResponse("CA_BLAW_1","Delhi","New Delhi","Ankur","Sharma","Banking Law","ICICI Bank","Nominee rights not granted",50000,"","","","","",""))
-        tempList.add(CaseResponse("CA_CPLaw_1","Uttar Pradesh","Agra","Vishesh","Singh","Consumer Protection Law","IDFC First Bank","Accidental Claim",15000,"","","","","",""))
 
-        CasesListActivity.applicationList = tempList
-        CasesListActivity.originalList = tempList
     }
 
     private fun btnBackCaseListSetOnClickListener() {
         btnBackCaseList.setOnClickListener {
-            val intent=Intent(context, Dashboard::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            startActivity(intent)
+//            val intent=Intent(context, Dashboard::class.java)
+//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+//            startActivity(intent)
+            activity?.finish()
         }
     }
 
@@ -148,29 +141,12 @@ class CasesListFragment : Fragment(), OnApplicationClicked {
     }
 
     private fun showFilteredCases() {
-        var tempList = mutableListOf<CaseResponse>()
-        btnClearFilter.visibility = View.VISIBLE
-        for(curr in CasesListActivity.originalList)
-        {
-            if(curr.caseType == CasesListActivity.caseType)
-            {
-                tempList.add(curr)
-            }
-        }
 
-        if(tempList.size == 0)
-        {
-            Toast.makeText(context,"No case of ${CasesListActivity.caseType} found!",Toast.LENGTH_LONG).show()
-        }
-
-        CasesListActivity.applicationList = tempList
-        loadCaseCards()
     }
 
     override fun onApplicationItemClicked(position: Int) {
         CasesListActivity.selectedApplicationNumber = position
         activity?.supportFragmentManager?.beginTransaction()?.replace(R.id.fl_wrapper_applications, CaseDetailsFragment())?.commit()
-//        Toast.makeText(this.context,"${CasesListActivity.applicationList[position].applicantFirstName}'s Application",Toast.LENGTH_SHORT).show()
     }
 
 }
