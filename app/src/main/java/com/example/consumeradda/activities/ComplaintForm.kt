@@ -1,9 +1,11 @@
 package com.example.consumeradda.activities
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.text.Editable
 import android.util.Log
 import android.view.View
@@ -13,16 +15,42 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.example.consumeradda.R
+import com.example.consumeradda.models.caseModels.CaseData
+import com.example.consumeradda.models.caseModels.CaseNumberResponse
+import com.example.consumeradda.models.caseModels.CaseResponse
+import com.example.consumeradda.service.CaseService
+import com.example.consumeradda.service.ServiceBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_complaint_form.*
+import kotlinx.android.synthetic.main.activity_sign_up.*
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 class ComplaintForm : AppCompatActivity() {
 
     private lateinit var mAuth : FirebaseAuth
     lateinit var mStorageRef:StorageReference
+
+    /**  Contact Details */
+    var phoneNumber = ""
+
+    /**  Personal details   */
+    lateinit var firstName: String
+    lateinit var lastName: String
+    var city: String = "Select One:"
+    var state: String = "Select One:"
+    var stateNumber:Int = -1
+    var districtNumber: Int = -1
+
+    /**  Case Details */
+    lateinit var caseAgainst: String
+    lateinit var caseOverview: String
+    lateinit var moneyInvolved: String
     var attachmentUri1 : Uri ?= null
     var attachmentUri2 : Uri ?= null
     var attachmentUri3 : Uri ?= null
@@ -31,15 +59,6 @@ class ComplaintForm : AppCompatActivity() {
     private val ATTACHMENT = 0
     var btnNumber = -1
     var casetype :String = "Select One:"
-    lateinit var caseAgainst: String
-    lateinit var caseOverview: String
-    lateinit var moneyInvolved: String
-    var phoneNumber = ""
-
-    lateinit var firstName: String
-    lateinit var lastName: String
-    var city: String = "Select One:"
-    var state: String = "Select One:"
     var attachment1DownloadableUrl : String = ""
     var attachment2DownloadableUrl : String = ""
     var attachment3DownloadableUrl : String = ""
@@ -51,11 +70,8 @@ class ComplaintForm : AppCompatActivity() {
     var attachment3Uploaded = false
     var attachment4Uploaded = false
     var attachment5Uploaded = false
+    var caseNumber: Int = 0
 
-    val APPLICATIONSUBMITTAG = "Application-Submit"
-
-
-//    val caseTypes = resources.getStringArray(R.array.caseType)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -129,6 +145,7 @@ class ComplaintForm : AppCompatActivity() {
     }
 
     private fun updateCity(position: Int) {
+        stateNumber = position
         when(position)
         {
             0-> {
@@ -141,6 +158,7 @@ class ComplaintForm : AppCompatActivity() {
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                             city = "Select One:"
+                        districtNumber = 0
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -158,6 +176,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -182,6 +201,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -206,6 +226,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -230,6 +251,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -254,6 +276,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -278,6 +301,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -302,6 +326,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -326,6 +351,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -350,6 +376,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -374,6 +401,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -398,6 +426,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -422,6 +451,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -446,6 +476,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -470,6 +501,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -494,6 +526,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -518,6 +551,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -542,6 +576,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -566,6 +601,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -590,6 +626,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -614,6 +651,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -638,6 +676,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -662,6 +701,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -686,6 +726,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -710,6 +751,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -734,6 +776,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -758,6 +801,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -782,6 +826,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -806,6 +851,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -830,6 +876,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -854,6 +901,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -878,6 +926,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -901,6 +950,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -924,6 +974,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -947,6 +998,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -970,6 +1022,7 @@ class ComplaintForm : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                        districtNumber = position
                         if(position!=0)
                         {
                             city = districts[position]
@@ -995,13 +1048,45 @@ class ComplaintForm : AppCompatActivity() {
                 btnSubmitCase.isEnabled = false
                 btnSubmitCase.isClickable = false
                 btnSubmitCase.text = ""
-                uploadDoc1()
+                getNumber()
             }
         }
     }
 
+    private fun getNumber() {
+        val caseService = ServiceBuilder.buildService(CaseService::class.java)
+        val requestCall = caseService.addCase()
+        requestCall.enqueue(object: Callback<CaseNumberResponse>{
+            override fun onResponse(call: Call<CaseNumberResponse>, response: Response<CaseNumberResponse>) {
+                if(response.isSuccessful)
+                {
+                    caseNumber = response.body()!!.casesTillDate
+                    Log.d("Submit Case","$caseNumber")
+                    uploadDoc1()
+//                    Toast.makeText(this@ComplaintForm,"CaseAdded  ${caseNumber}",Toast.LENGTH_SHORT).show()
+                }
+                else
+                {
+                    pbSubmitCase.visibility = View.INVISIBLE
+                    btnSubmitCase.text = "Submit Case"
+                    btnSubmitCase.isEnabled = true
+                    btnSubmitCase.isClickable = true
+                    val jObjError = JSONObject(response.errorBody()!!.string())
+                    Toast.makeText(this@ComplaintForm,"${jObjError.getString("msg")}",Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<CaseNumberResponse>, t: Throwable) {
+                pbSubmitCase.visibility = View.INVISIBLE
+                btnSubmitCase.text = "Submit Case"
+                Toast.makeText(this@ComplaintForm,"No Internet / Server Down",Toast.LENGTH_SHORT).show()
+            }
+
+        })
+    }
+
     private fun uploadDoc1() {
-        val mDocsRef = mStorageRef.child(mAuth.currentUser!!.uid).child("docs/attachmentUri1.pdf")
+        val mDocsRef = mStorageRef.child(mAuth.currentUser!!.uid+"-CA-"+caseNumber.toString()).child("docs/attachmentUri1.pdf")
         mDocsRef.putFile(attachmentUri1!!).continueWithTask{ task->
             if (!task.isSuccessful) {
                 task.exception?.let {
@@ -1031,7 +1116,7 @@ class ComplaintForm : AppCompatActivity() {
     }
 
     private fun uploadDoc2() {
-        val mDocsRef = mStorageRef.child(mAuth.currentUser!!.uid).child("docs/attachmentUri2.pdf")
+        val mDocsRef = mStorageRef.child(mAuth.currentUser!!.uid+"-CA-"+caseNumber.toString()).child("docs/attachmentUri2.pdf")
         mDocsRef.putFile(attachmentUri2!!).continueWithTask{ task->
             if (!task.isSuccessful) {
                 task.exception?.let {
@@ -1059,7 +1144,7 @@ class ComplaintForm : AppCompatActivity() {
     }
 
     private fun uploadDoc3() {
-        val mDocsRef = mStorageRef.child(mAuth.currentUser!!.uid).child("docs/attachmentUri3.pdf")
+        val mDocsRef = mStorageRef.child(mAuth.currentUser!!.uid+"-CA-"+caseNumber.toString()).child("docs/attachmentUri3.pdf")
         mDocsRef.putFile(attachmentUri3!!).continueWithTask{ task->
             if (!task.isSuccessful) {
                 task.exception?.let {
@@ -1087,7 +1172,7 @@ class ComplaintForm : AppCompatActivity() {
     }
 
     private fun uploadDoc4() {
-        val mDocsRef = mStorageRef.child(mAuth.currentUser!!.uid).child("docs/attachmentUri4.pdf")
+        val mDocsRef = mStorageRef.child(mAuth.currentUser!!.uid+"-CA-"+caseNumber.toString()).child("docs/attachmentUri4.pdf")
         mDocsRef.putFile(attachmentUri4!!).continueWithTask{ task->
             if (!task.isSuccessful) {
                 task.exception?.let {
@@ -1115,7 +1200,7 @@ class ComplaintForm : AppCompatActivity() {
     }
 
     private fun uploadDoc5() {
-        val mDocsRef = mStorageRef.child(mAuth.currentUser!!.uid).child("docs/attachmentUri5.pdf")
+        val mDocsRef = mStorageRef.child(mAuth.currentUser!!.uid+"-CA-"+caseNumber.toString()).child("docs/attachmentUri5.pdf")
         mDocsRef.putFile(attachmentUri5!!).continueWithTask{ task->
             if (!task.isSuccessful) {
                 task.exception?.let {
@@ -1138,13 +1223,94 @@ class ComplaintForm : AppCompatActivity() {
     }
 
     private fun submitCase() {
+        val curruser= mAuth.currentUser
+        val clEmail=curruser?.email.toString()
 
+        val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+        val fireId = sharedPreferences.getString("FIREBASE_ID","").toString()
+
+        val data = CaseData(
+                caseId = caseNumber,
+                applicantFirebaseId = fireId,
+                applicantEmail = clEmail,
+                applicantFirstName = firstName,
+                applicantLastName = lastName,
+                applicantState = state,
+                stateNumber = stateNumber,
+                applicantDistrict = city,
+                districtNumber = districtNumber,
+                caseAgainst = caseAgainst,
+                caseType = casetype,
+                caseDescription = caseOverview,
+                caseMoney = moneyInvolved,
+                attachment1 = attachment1DownloadableUrl,
+                attachment2 = attachment2DownloadableUrl,
+                attachment3 = attachment3DownloadableUrl,
+                attachment4 = attachment4DownloadableUrl,
+                attachment5 = attachment5DownloadableUrl,
+                applicantPhone = phoneNumber,
+                lawyerFirebaseId = "N/A",
+                lawyerName = "N/A",
+                lawyerEmail = "N/A",
+                caseStatus = 0
+        )
+
+        Log.d("Data","$data")
+
+
+
+        val caseService = ServiceBuilder.buildService(CaseService::class.java)
+        val requestCall = caseService.submitCase(data)
+        requestCall.enqueue(object: Callback<CaseResponse>{
+            override fun onResponse(call: Call<CaseResponse>, response: Response<CaseResponse>) {
+                if(response.isSuccessful)
+                {
+                    val mess = response.body()!!.msg
+                    Toast.makeText(this@ComplaintForm,"${mess}",Toast.LENGTH_SHORT).show()
+                    if(mess.get(0)=='C')
+                    {
+                        pbSubmitCase.visibility = View.INVISIBLE
+                        btnSubmitCase.text = "Submit Case"
+                        btnSubmitCase.isEnabled = false
+                        btnSubmitCase.isClickable = false
+                        Handler().postDelayed({
+                            toDashboardActivity()
+                        },2000)
+                    }
+                    else
+                    {
+                        pbSubmitCase.visibility = View.INVISIBLE
+                        btnSubmitCase.text = "Submit Case"
+                        btnSubmitCase.isEnabled = true
+                        btnSubmitCase.isClickable = true
+                    }
+                    Log.d("Submit Case","$mess")
+                }
+                else
+                {
+                    pbSubmitCase.visibility = View.INVISIBLE
+                    btnSubmitCase.text = "Submit Case"
+                    btnSubmitCase.isEnabled = true
+                    btnSubmitCase.isClickable = true
+                    val jObjError = JSONObject(response.errorBody()!!.string())
+                    Toast.makeText(this@ComplaintForm,"${jObjError.getString("msg")}",Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<CaseResponse>, t: Throwable) {
+                pbSubmitCase.visibility = View.INVISIBLE
+                btnSubmitCase.text = "Submit Case"
+                btnSubmitCase.isEnabled = true
+                btnSubmitCase.isClickable = true
+                Toast.makeText(this@ComplaintForm,"No Internet / Server Down",Toast.LENGTH_SHORT).show()
+            }
+
+        })
     }
 
     private fun toDashboardActivity() {
-        val intent = Intent(this, Dashboard::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
+        startActivity(Intent(this,Dashboard::class.java))
+        finish()
     }
 
     private fun toastMaker(message: String?) {
@@ -1212,7 +1378,7 @@ class ComplaintForm : AppCompatActivity() {
             return false
         }
 
-        if(casetype == "Select One:")
+        if(casetype.equals("Select One:"))
         {
             Toast.makeText(this,"Select some case type",Toast.LENGTH_SHORT).show()
             btnCaseType.requestFocus()

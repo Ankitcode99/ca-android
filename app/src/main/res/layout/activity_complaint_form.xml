@@ -669,7 +669,7 @@
                 android:padding="12dp"
                 android:gravity="center_vertical"
                 android:backgroundTint="#5896d6"
-                android:text="Submit"
+                android:text="Submit Case"
                 android:textColor="#fff"
                 android:textSize="18sp"
                 android:background="@drawable/btn_bg"

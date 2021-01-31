@@ -1,10 +1,6 @@
 package com.example.consumeradda.models.caseModels
 
-data class Case (
-        var _id:String,
-        var lawyerFirebaseId:String,
-        var lawyerName:String,
-        var lawyerEmail:String,
+data class CaseData(
         var caseId:Int,
         var applicantFirebaseId:String,
         var applicantEmail:String,
@@ -19,12 +15,13 @@ data class Case (
         var caseDescription:String,
         var caseMoney:String,
         var attachment1:String,
-        var attachment2: String,
-        var attachment3: String,
-        var attachment4: String,
-        var attachment5: String,
+        var attachment2:String,
+        var attachment3:String,
+        var attachment4:String,
+        var attachment5:String,
         var applicantPhone:String,
-        var caseStatus:Int,
-        var lastActionDate:String,
-        var __v:Int
+        var lawyerFirebaseId:String,
+        var lawyerName:String,
+        var lawyerEmail:String,
+        var caseStatus: Int
 )

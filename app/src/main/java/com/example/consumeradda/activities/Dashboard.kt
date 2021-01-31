@@ -45,14 +45,14 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
     var role : Int = 2
     lateinit var currentUser : Register
     private lateinit var CardModelList: MutableList<Case>
-//    val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+
 
     companion object {
         var DASHBOARDTAG="DASHBOARDTAG"
         var state="State"
         var district="District"
-        var stateNum=-1
-        var districtNum=-1
+        var stateNum=0
+        var districtNum=0
         var fetchCases = false
         var cardPositionClicked=-1
 //        lateinit var CardModelList: MutableList<Case>
@@ -68,10 +68,10 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
         role = sharedPreferences.getInt("ROLE",-1)
         val verif = sharedPreferences.getBoolean("VERIFIED",false)
         Log.d("VERIFY",verif.toString())
-//
-//
         Log.d("FirebaseID",fireId)
         Log.d("ROLES ",role.toString())
+
+//        doSignOut()
 
         if(role==-1 || verif == false)
         {
@@ -264,7 +264,14 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
             }
             else if(complaint_btn.text.toString() == "Cases List")
             {
-                startActivity(Intent(this,CasesListActivity::class.java))
+                if(stateNum==0)
+                {
+                    Toast.makeText(this,"You have to select either\na State or both State and District",Toast.LENGTH_LONG).show()
+                }
+                else
+                {
+                    startActivity(Intent(this,CasesListActivity::class.java))
+                }
             }
             else
             {
@@ -340,7 +347,13 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
 //                            updateDashboard()
                         }
                     }
-
+                    else
+                    {
+                        pbSupport.visibility = View.INVISIBLE
+                        btnMore.isEnabled = true
+                        tvSupportMessage1.text = "Some error Occurred!\nPlease restart the app."
+                        Toast.makeText(this@Dashboard,"An error occured! ${response.body().toString()}",Toast.LENGTH_LONG).show()
+                    }
                 }
                 else
                 {
@@ -384,9 +397,13 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
     }
 
     private fun tvCardHeaderSetOnClickListener() {
+
+
         tvCardHeader.setOnClickListener {
             if(tvCardHeader.text.equals("Location Selected") || tvCardHeader.text.equals("Select Location"))
             {
+
+
                 val mDialog = BottomSheetDialog(this)
                 mDialog.setContentView(R.layout.location_dialog)
                 val window = mDialog.window
@@ -409,6 +426,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int, id: Long)
                     {
                         state = StatesList[position]
+                        stateNum = position
                         when(position)
                         {
                             0-> {
@@ -421,6 +439,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                                         district = "Select One:"
+                                        districtNum = 0
                                     }
 
                                     override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -438,6 +457,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -462,6 +482,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -486,6 +507,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -510,6 +532,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -534,6 +557,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -558,6 +582,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -582,6 +607,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -606,6 +632,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -630,6 +657,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -654,6 +682,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -678,6 +707,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -702,6 +732,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -726,6 +757,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -750,6 +782,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -774,6 +807,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -798,6 +832,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -822,6 +857,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -846,6 +882,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -870,6 +907,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -894,6 +932,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -918,6 +957,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -942,6 +982,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -966,6 +1007,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -990,6 +1032,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -1014,6 +1057,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -1038,6 +1082,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -1062,6 +1107,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -1086,6 +1132,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -1110,6 +1157,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -1134,6 +1182,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -1158,6 +1207,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -1181,6 +1231,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -1204,6 +1255,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -1227,6 +1279,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -1250,6 +1303,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                                     }
 
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long) {
+                                        districtNum = position
                                         if(position!=0)
                                         {
                                             district = districts[position]
@@ -1281,7 +1335,9 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                     editor.apply{
                         putString("DISTRICT", district)
                         putString("STATE", state)
-                    }
+                        putInt("DISTRICT_NUMBER",districtNum)
+                        putInt("STATE_NUMBER",stateNum)
+                    }.apply()
 
                     tvCardData.text = "${district}, ${state}"
                     mDialog.dismiss()
@@ -1350,6 +1406,8 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                 val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
                 state = sharedPreferences.getString("STATE","Select One:").toString()
                 district = sharedPreferences.getString("DISTRICT","Select One:").toString()
+                stateNum = sharedPreferences.getInt("STATE_NUMBER",0)
+                districtNum = sharedPreferences.getInt("DISTRICT_NUMBER",0)
                 tvCardData.text = "${district}, ${state}"
             }
             else
@@ -1369,6 +1427,8 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                     val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
                     state = sharedPreferences.getString("STATE","Select One:").toString()
                     district = sharedPreferences.getString("DISTRICT","Select One:").toString()
+                    stateNum = sharedPreferences.getInt("STATE_NUMBER",0)
+                    districtNum = sharedPreferences.getInt("DISTRICT_NUMBER",0)
                     tvCardData.text = "${district}, ${state}"
                     cvCurrent.visibility = View.VISIBLE
                 }
@@ -1426,6 +1486,8 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
             putString("NAME",null)
             putString("DISTRICT",null)
             putString("STATE",null)
+            putInt("STRING_NUMBER",-1)
+            putInt("DISTRICT_NUMBER",-1)
         }.apply()
         FirebaseAuth.getInstance().signOut()
         val intent = Intent(this, LoginActivity::class.java)

@@ -16,16 +16,7 @@ class CasesListActivity : AppCompatActivity() {
         var applicationList= mutableListOf<Case>()
         var originalList = mutableListOf<Case>()
         var selectedApplicationNumber=-1
-        var fragnumber=0
-        var dataForLocationFrag=0 // 1 - state, 2 - district
-        var state=""
-        var district=""
-        var filterState=""
-        var filterDistrict=""
-        var stateNum=-1
-        var districtNum=-1
         var caseType=""
-        var isLocationFiltered=false
         var isCaseTypeFiltered = false
     }
 
