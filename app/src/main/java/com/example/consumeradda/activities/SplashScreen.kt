@@ -29,7 +29,6 @@ class SplashScreen : AppCompatActivity() {
         countdownTimer = object : CountDownTimer(2000, 1000) {
             override fun onTick(millisUntilFinished: Long) {}
             override fun onFinish() {
-                Toast.makeText(this@SplashScreen,"Ok till here",Toast.LENGTH_SHORT).show()
                 val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
                 val isLoggedIn = sharedPreferences.getBoolean("LOGGED_IN",false)
                 Log.d("Status",isLoggedIn.toString())
