@@ -1054,8 +1054,12 @@ class ComplaintForm : AppCompatActivity() {
     }
 
     private fun getNumber() {
+
+        val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+        val token = sharedPreferences.getString("ID_TOKEN","localToken").toString()
+
         val caseService = ServiceBuilder.buildService(CaseService::class.java)
-        val requestCall = caseService.addCase()
+        val requestCall = caseService.addCase(token)
         requestCall.enqueue(object: Callback<CaseNumberResponse>{
             override fun onResponse(call: Call<CaseNumberResponse>, response: Response<CaseNumberResponse>) {
                 if(response.isSuccessful)
@@ -1228,6 +1232,7 @@ class ComplaintForm : AppCompatActivity() {
 
         val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
         val fireId = sharedPreferences.getString("FIREBASE_ID","").toString()
+        val token = sharedPreferences.getString("ID_TOKEN","localToken").toString()
 
         val data = CaseData(
                 caseId = caseNumber,
@@ -1260,7 +1265,7 @@ class ComplaintForm : AppCompatActivity() {
 
 
         val caseService = ServiceBuilder.buildService(CaseService::class.java)
-        val requestCall = caseService.submitCase(data)
+        val requestCall = caseService.submitCase(token, data)
         requestCall.enqueue(object: Callback<CaseResponse>{
             override fun onResponse(call: Call<CaseResponse>, response: Response<CaseResponse>) {
                 if(response.isSuccessful)
@@ -1388,6 +1393,7 @@ class ComplaintForm : AppCompatActivity() {
         if(btnNumber == -1)
         {
             Toast.makeText(this,"Upload at-least one attachment",Toast.LENGTH_SHORT).show()
+            btnAttachment1.requestFocus()
             return false
         }
 

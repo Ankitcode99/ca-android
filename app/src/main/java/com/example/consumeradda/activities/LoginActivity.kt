@@ -22,6 +22,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var idToken : String
     val LOGINFRAGTAG = "Login-Tag"
+    private lateinit var user : FirebaseUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,8 +102,9 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithEmailAndPassword(email, pwd)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    val user = auth.currentUser
-                    updateUI(user)
+                    user = auth.currentUser!!
+                    getIdToken()
+
                 } else {
                     pbLogin.visibility = View.INVISIBLE
                     etLoginEmail.isActivated = true
@@ -116,6 +118,22 @@ class LoginActivity : AppCompatActivity() {
                 }
 
             }
+    }
+
+    private fun getIdToken() {
+        auth.currentUser!!.getIdToken(true).addOnCompleteListener {
+            if (it.isSuccessful) {
+                val idTokenn = it.result!!.token!!
+                val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.apply{
+                    putString("ID_TOKEN",idTokenn)
+                }.apply()
+
+                Log.i("Testing-Login",idTokenn)
+                updateUI(user)
+            }
+        }
     }
 
     private fun startLogin() {

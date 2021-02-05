@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
+import android.widget.Toast
 import com.example.consumeradda.R
 import com.google.firebase.auth.FirebaseAuth
 
@@ -28,7 +29,7 @@ class SplashScreen : AppCompatActivity() {
         countdownTimer = object : CountDownTimer(2000, 1000) {
             override fun onTick(millisUntilFinished: Long) {}
             override fun onFinish() {
-
+                Toast.makeText(this@SplashScreen,"Ok till here",Toast.LENGTH_SHORT).show()
                 val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
                 val isLoggedIn = sharedPreferences.getBoolean("LOGGED_IN",false)
                 Log.d("Status",isLoggedIn.toString())
@@ -41,9 +42,24 @@ class SplashScreen : AppCompatActivity() {
     private fun callIntent(loggedIn: Boolean) {
         if (!isSplashScreenDone) {
             if (loggedIn && mAuth.currentUser!=null) {
+                getIdToken()
                 goToDashboard()
             } else {
                 goToAuth()
+            }
+        }
+    }
+
+    private fun getIdToken() {
+        mAuth.currentUser!!.getIdToken(true).addOnCompleteListener {
+            if (it.isSuccessful) {
+                val idTokenn = it.result!!.token!!
+                val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.apply{
+                    putString("ID_TOKEN",idTokenn)
+                }.apply()
+                Log.i("Testing",idTokenn)
             }
         }
     }

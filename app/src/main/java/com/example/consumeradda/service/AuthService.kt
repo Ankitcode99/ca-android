@@ -13,6 +13,6 @@ interface AuthService {
     @POST("createUser")
     fun registerUser(@Body userData: Register): Call<RegisterDefaultResponse>
 
-    @GET("userData/{id}")
-    fun getUserData(@Path ("id") id:String): Call<List<Register>>
+    @GET("userData/{id}/{token}")
+    fun getUserData(@Path ("id") id:String,@Path("token") token:String): Call<List<Register>>
 }

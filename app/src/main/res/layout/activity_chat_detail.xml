@@ -40,10 +40,10 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/tvApplicantName"
+                android:id="@+id/tvCDClientName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Applicant's Name"
+                android:text="Client's Name"
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginTop="20dp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -57,15 +57,15 @@
                 android:id="@+id/cvApplicationDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="15dp"
                 android:layout_marginTop="20dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="15dp"
                 app:cardBackgroundColor="#e2e2e2"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="3dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvApplicantName">
+                app:layout_constraintTop_toBottomOf="@id/tvCDClientName">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -76,15 +76,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
-                        android:layout_marginTop="15dp"
+                        android:layout_marginTop="18dp"
                         android:text="Applicant's Location"
-                        android:textSize="13sp"
+                        android:textSize="15sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         android:layout_marginLeft="15dp" />
 
                     <TextView
-                        android:id="@+id/tvApplicantHometown"
+                        android:id="@+id/tvClientHometown"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
@@ -102,12 +102,12 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="15dp"
                         android:text="Case Against"
-                        android:textSize="13sp"
-                        app:layout_constraintStart_toStartOf="@id/tvApplicantHometown"
-                        app:layout_constraintTop_toBottomOf="@id/tvApplicantHometown" />
+                        android:textSize="15sp"
+                        app:layout_constraintStart_toStartOf="@id/tvClientHometown"
+                        app:layout_constraintTop_toBottomOf="@id/tvClientHometown" />
 
                     <TextView
-                        android:id="@+id/tvApplicantInstitutionName"
+                        android:id="@+id/tvCDCaseAgainst"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
@@ -120,17 +120,41 @@
                         app:layout_constraintTop_toBottomOf="@id/tvAppInstituteName" />
 
                     <TextView
+                        android:id="@+id/tvCDDesc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="Case Description"
+                        android:textSize="15sp"
+                        app:layout_constraintStart_toStartOf="@id/tvClientHometown"
+                        app:layout_constraintTop_toBottomOf="@id/tvCDCaseAgainst" />
+
+                    <TextView
+                        android:id="@+id/tvCDCaseDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_marginRight="15dp"
+                        android:text="Case Description"
+                        android:textColor="#000"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toBottomOf="@id/tvCDDesc" />
+
+
+                    <TextView
                         android:id="@+id/tvAppInstituteLocation"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="15dp"
                         android:text="Case Type"
-                        android:textSize="13sp"
-                        app:layout_constraintStart_toStartOf="@id/tvApplicantInstitutionName"
-                        app:layout_constraintTop_toBottomOf="@id/tvApplicantInstitutionName" />
+                        android:textSize="15sp"
+                        app:layout_constraintStart_toStartOf="@id/tvCDCaseAgainst"
+                        app:layout_constraintTop_toBottomOf="@id/tvCDCaseDescription" />
 
                     <TextView
-                        android:id="@+id/tvApplicantInstitutionLocation"
+                        android:id="@+id/tvCDCaseType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
@@ -158,7 +182,7 @@
                 android:text="Attachments"
                 android:textSize="20sp"
                 android:textColor="#000"
-                app:layout_constraintStart_toStartOf="@id/tvApplicantName"
+                app:layout_constraintStart_toStartOf="@id/tvCDClientName"
                 app:layout_constraintTop_toBottomOf="@id/cvApplicationDetails"
                 />
 

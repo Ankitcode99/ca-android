@@ -6,21 +6,24 @@ import retrofit2.http.*
 
 interface CaseService {
 
-    @GET("getCases/{id}")
-    fun fetchCases(@Path("id") id:String): Call<MutableList<Case>>
+    @GET("getCases/{id}/{token}")
+    fun fetchCases(@Path("id") id:String, @Path("token") token:String): Call<MutableList<Case>>
 
-    @PATCH("addcase")
-    fun addCase() : Call<CaseNumberResponse>
+    @PATCH("addcase/{token}")
+    fun addCase(@Path("token") token:String) : Call<CaseNumberResponse>
 
-    @PATCH("accept/{id}")
-    fun acceptCase(@Path("id") id:Int, @Body lawyerData: AcceptCase) : Call<AcceptCaseResponse>
+    @PATCH("accept/{id}/{token}")
+    fun acceptCase(@Path("id") id:Int, @Path("token") token:String ,@Body lawyerData: AcceptCase) : Call<AcceptCaseResponse>
 
-    @GET("/seeCasesS/{id}")
-    fun seeStateCases(@Path("id") id:Int): Call<MutableList<Case>>
+    @GET("/seeCasesS/{id}/{token}")
+    fun seeStateCases(@Path("id") id:Int, @Path("token") token:String): Call<MutableList<Case>>
 
-    @GET("seeCasesSD/{state}/{district}")
-    fun seeStateDistrictCases(@Path("state") state:Int, @Path("district") district:Int): Call<MutableList<Case>>
+    @GET("seeCasesSD/{state}/{district}/{token}")
+    fun seeStateDistrictCases(@Path("state") state:Int, @Path("district") district:Int,@Path("token") token:String): Call<MutableList<Case>>
 
-    @POST("submitCase")
-    fun submitCase(@Body caseData : CaseData): Call<CaseResponse>
+    @POST("submitCase/{token}")
+    fun submitCase(@Path("token") token:String, @Body caseData : CaseData): Call<CaseResponse>
+
+    @PATCH("/updateStatus/{id}/{status}/{token}")
+    fun updateCaseStatus(@Path("id") id:Int,@Path("status") status:Int,@Path("token") token:String): Call<CaseResponse>
 }

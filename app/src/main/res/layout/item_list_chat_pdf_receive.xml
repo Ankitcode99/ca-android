@@ -10,13 +10,12 @@
     android:paddingEnd="16dp"
     android:paddingBottom="4dp">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/cvMessageReceive"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/systemViolet"
+        app:cardBackgroundColor="@color/systemBlue"
         app:cardElevation="0dp"
-        app:cardCornerRadius="8dp"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
@@ -50,17 +49,18 @@
                     android:src="@drawable/pdf_icon"
                     android:background="@color/systemViolet"/>
             </LinearLayout>
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/ibCAPdfDownload"
-                    android:paddingRight="4dp"
-                    android:src="@drawable/ic_baseline_arrow_circle_down_24"
-                    android:background="@color/systemViolet"
-                    android:layout_gravity="end"/>
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ibCAPdfDownload"
+                android:paddingRight="4dp"
+                android:src="@drawable/ic_baseline_arrow_circle_down_24"
+                android:background="@color/systemViolet"
+                android:layout_gravity="end"/>
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
+
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline3"

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="15dp"
+
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvUpdStatus"
+            android:text="Updated Status"
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_height="wrap_content"
+            />
+
+        <View
+            android:id="@+id/vUSsep"
+            android:background="#a9a9a9"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@id/tvUpdStatus"
+            android:layout_width="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_height="1dp"/>
+
+        <RadioButton
+            android:id="@+id/rbUSMediation"
+            android:text="Mediation Initiated"
+            android:layout_width="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="15dp"
+            android:textSize="16sp"
+            android:buttonTint="@color/systemBlue"
+            android:layout_marginLeft="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vUSsep"
+            android:layout_height="wrap_content"/>
+
+        <RadioButton
+            android:id="@+id/rbUSNotice"
+            android:text="Legal Notice Sent"
+            android:layout_width="wrap_content"
+            android:textSize="16sp"
+            android:buttonTint="@color/systemBlue"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rbUSMediation"
+            android:layout_height="wrap_content"/>
+
+        <RadioButton
+            android:id="@+id/rbUSCaseFiled"
+            android:text="Case Filed In Court"
+            android:layout_width="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:textSize="16sp"
+            android:buttonTint="@color/systemBlue"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rbUSNotice"
+            android:layout_height="wrap_content"/>
+
+        <RadioButton
+            android:id="@+id/rbUSCaseClosed"
+            android:text="Case Closed"
+            android:layout_width="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:textSize="16sp"
+            android:buttonTint="@color/systemBlue"
+            android:layout_marginBottom="15dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rbUSCaseFiled"
+            android:layout_height="wrap_content"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

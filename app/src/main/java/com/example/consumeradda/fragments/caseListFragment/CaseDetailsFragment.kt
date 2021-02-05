@@ -78,6 +78,7 @@ class CaseDetailsFragment : Fragment() {
             btnAcceptCase.text = ""
             btnAcceptCase.isClickable = false
             val sharedPreferences = activity?.getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+            val token = sharedPreferences?.getString("ID_TOKEN","localToken").toString()
             val lawyername = sharedPreferences?.getString("NAME","").toString()
             val fireId = sharedPreferences?.getString("FIREBASE_ID","").toString()
             val curruser= mAuth.currentUser
@@ -96,7 +97,7 @@ class CaseDetailsFragment : Fragment() {
                 val caseid = CasesListActivity.applicationList[CasesListActivity.selectedApplicationNumber].caseId
                 val obj = AcceptCase(lawyerFirebaseId = fireId, lawyerName = lawyername, lawyerEmail = lawyeremail)
                 val caseService = ServiceBuilder.buildService(CaseService::class.java)
-                val requestCall = caseService.acceptCase(caseid,obj)
+                val requestCall = caseService.acceptCase(caseid,token,obj)
                 requestCall.enqueue(object: Callback<AcceptCaseResponse>{
                     override fun onResponse(call: Call<AcceptCaseResponse>, response: Response<AcceptCaseResponse>) {
                         if(response.isSuccessful)

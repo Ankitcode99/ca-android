@@ -103,6 +103,7 @@ class CasesListFragment : Fragment(), OnApplicationClicked {
 
     private fun getApplications() {
 
+
         val sharedPreferences = activity?.getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
 
         var stateNum = -1
@@ -124,8 +125,12 @@ class CasesListFragment : Fragment(), OnApplicationClicked {
     }
 
     private fun getAllApplications(stateNum: Int, districtNum: Int) {
+
+        val sharedPreferences = activity?.getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+        val token = sharedPreferences?.getString("ID_TOKEN","localToken").toString()
+
         val caseService = ServiceBuilder.buildService(CaseService::class.java)
-        val requestCall = caseService.seeStateDistrictCases(stateNum,districtNum)
+        val requestCall = caseService.seeStateDistrictCases(stateNum,districtNum,token)
 
         requestCall.enqueue(object : Callback<MutableList<Case>>{
             override fun onResponse(call: Call<MutableList<Case>>, response: Response<MutableList<Case>>) {
@@ -137,6 +142,7 @@ class CasesListFragment : Fragment(), OnApplicationClicked {
                     Log.d("CasesList","${casesList.size}")
                     if(casesList.size == 0)
                     {
+                        tvFilterCase.visibility = View.INVISIBLE
                         Toast.makeText(context,"No open cases in the selected location", Toast.LENGTH_SHORT).show()
                     }
                     else
@@ -168,8 +174,12 @@ class CasesListFragment : Fragment(), OnApplicationClicked {
     }
 
     private fun getStatesApplications(stateNum: Int) {
+
+        val sharedPreferences = activity?.getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+        val token = sharedPreferences?.getString("ID_TOKEN","localToken").toString()
+
         val caseService = ServiceBuilder.buildService(CaseService::class.java)
-        val requestCall = caseService.seeStateCases(stateNum)
+        val requestCall = caseService.seeStateCases(stateNum,token)
         requestCall.enqueue(object : Callback<MutableList<Case>>{
             override fun onResponse(call: Call<MutableList<Case>>, response: Response<MutableList<Case>>) {
                 if(response.isSuccessful)
@@ -180,6 +190,7 @@ class CasesListFragment : Fragment(), OnApplicationClicked {
                     Log.d("CasesList","${casesList.size}")
                     if(casesList.size == 0)
                     {
+                        tvFilterCase.visibility = View.INVISIBLE
                         Toast.makeText(context,"No open cases in the selected location", Toast.LENGTH_SHORT).show()
                     }
                     else

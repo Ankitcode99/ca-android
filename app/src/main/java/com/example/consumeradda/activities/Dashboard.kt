@@ -40,11 +40,10 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
 
     private lateinit var auth: FirebaseAuth
     private var isCardInfoDisplayed : Boolean = false
-    private var cardPositionClicked : Int = -1
     private lateinit var cardAdapter: DashboardCardAdapter
     var role : Int = 2
     lateinit var currentUser : Register
-    private lateinit var CardModelList: MutableList<Case>
+//    private lateinit var CardModelList: MutableList<Case>
 
 
     companion object {
@@ -55,7 +54,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
         var districtNum=0
         var fetchCases = false
         var cardPositionClicked=-1
-//        lateinit var CardModelList: MutableList<Case>
+        lateinit var CardModelList: MutableList<Case>
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,6 +69,8 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
         Log.d("VERIFY",verif.toString())
         Log.d("FirebaseID",fireId)
         Log.d("ROLES ",role.toString())
+
+
 
 //        doSignOut()
 
@@ -92,8 +93,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
         }
         else
         {
-            if(!fetchCases)
-            {
+
                 fetchCases = true
                 vpCardView.visibility = View.INVISIBLE
                 Log.d("HERE","Done")
@@ -110,16 +110,13 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                 {
                     Toast.makeText(this,"Fetching User's Data",Toast.LENGTH_LONG).show()
                     getDataFromDB(fireId.toString())
-                }else
+                }
+                else
                 {
                     Toast.makeText(this,"Fetching Cases",Toast.LENGTH_LONG).show()
                     getUserCases(fireId.toString())
                 }
-            }
-            else
-            {
-                Toast.makeText(this,"Activity CREATE",Toast.LENGTH_LONG).show()
-            }
+
         }
 
         complaint_btnSetOnClickListener()
@@ -264,7 +261,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
             }
             else if(complaint_btn.text.toString() == "Cases List")
             {
-                if(stateNum==0)
+                if(stateNum==0 || state=="Select One:")
                 {
                     Toast.makeText(this,"You have to select either\na State or both State and District",Toast.LENGTH_LONG).show()
                 }
@@ -294,13 +291,11 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
 
     private fun getDataFromDB(fireId: String) {
 
-//        pbSupport.visibility = View.INVISIBLE
-//        btnMore.isEnabled = true
-//        return;
-//
-//
+        val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+        val token = sharedPreferences.getString("ID_TOKEN","localToken").toString()
+        Log.d("App-Debugging","$token")
         val authService = ServiceBuilder.buildService(AuthService::class.java)
-        val requestCall = authService.getUserData(fireId)
+        val requestCall = authService.getUserData(fireId,token)
         requestCall.enqueue(object: Callback<List<Register>> {
             override fun onResponse(call: Call<List<Register>>, response: Response<List<Register>>)
             {
@@ -357,11 +352,18 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                 }
                 else
                 {
+                    btnMore.isEnabled=true
+                    pbSupport.visibility = View.INVISIBLE
+                    Log.d("SessionMap","Ran")
                     val jObjError = JSONObject(response.errorBody()!!.string())
                     Toast.makeText(this@Dashboard,"${jObjError.getString("msg")}",Toast.LENGTH_LONG).show()
                 }
             }
             override fun onFailure(call: Call<List<Register>>, t: Throwable) {
+                pbSupport.visibility = View.INVISIBLE
+                btnMore.isEnabled = true
+                tvSupportMessage1.visibility = View.VISIBLE
+                tvSupportMessage1.text = "No Internet / Server Down"
                 Toast.makeText(this@Dashboard,"No Internet / Server Down",Toast.LENGTH_SHORT).show()
             }
         })
@@ -370,8 +372,12 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
 
     private fun getUserCases(fireId:String)
     {
+
+        val sharedPreferences = getSharedPreferences("ConsumerAdda",Context.MODE_PRIVATE)
+        val token = sharedPreferences.getString("ID_TOKEN","localToken").toString()
+
         val caseService = ServiceBuilder.buildService(CaseService::class.java)
-        val requestCall = caseService.fetchCases(fireId)
+        val requestCall = caseService.fetchCases(fireId,token)
         requestCall.enqueue(object: Callback<MutableList<Case>>{
             override fun onResponse(call: Call<MutableList<Case>>, response: Response<MutableList<Case>>) {
                 if(response.isSuccessful)
@@ -383,6 +389,7 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
                 {
                     pbSupport.visibility = View.INVISIBLE
                     tvSupportMessage1.visibility = View.VISIBLE
+                    btnMore.isEnabled=true
                     tvSupportMessage1.text = "Please restart the app!"
                     val jObjError = JSONObject(response.errorBody()!!.string())
                     Toast.makeText(this@Dashboard,"${jObjError.getString("msg")}",Toast.LENGTH_LONG).show()
@@ -390,6 +397,10 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
             }
 
             override fun onFailure(call: Call<MutableList<Case>>, t: Throwable) {
+                pbSupport.visibility = View.INVISIBLE
+                btnMore.isEnabled=true
+                tvSupportMessage1.visibility = View.VISIBLE
+                tvSupportMessage1.text = "No Internet / Server Down"
                 Toast.makeText(this@Dashboard,"No Internet / Server Error",Toast.LENGTH_LONG).show()
             }
 
@@ -1486,8 +1497,9 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
             putString("NAME",null)
             putString("DISTRICT",null)
             putString("STATE",null)
-            putInt("STRING_NUMBER",-1)
+            putInt("STATE_NUMBER",-1)
             putInt("DISTRICT_NUMBER",-1)
+            putString("ID_TOKEN",null)
         }.apply()
         FirebaseAuth.getInstance().signOut()
         val intent = Intent(this, LoginActivity::class.java)
@@ -1498,8 +1510,9 @@ class Dashboard : AppCompatActivity(), OnCardClicked {
     override fun onCardClicked(position: Int) {
         if(CardModelList[position].lawyerName != "N/A")
         {
+            cardPositionClicked = position
+            Log.d("Num","$cardPositionClicked")
             val intent = Intent(this,ChatActivity::class.java)
-            intent.putExtra("Client",CardModelList[position].applicantFirstName+" "+CardModelList[position].applicantLastName)
             startActivity(intent)
         }
     }
