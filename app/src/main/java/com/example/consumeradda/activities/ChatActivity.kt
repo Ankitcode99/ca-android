@@ -541,21 +541,20 @@ class ChatActivity : AppCompatActivity(),OnClicked {
 
         if(!btnAttachmentClicked)
         {
-            btnAddPdf.visibility= View.VISIBLE
+            btnAddPdf.visibility= View.GONE
             btnAddImage.visibility= View.VISIBLE
             btnAddImage.isClickable=true
-            btnAddPdf.isClickable=true
+            btnAddPdf.isClickable=false
             btnAddImage.isFocusable=true
-            btnAddPdf.isFocusable=true
+            btnAddPdf.isFocusable=false
             btnAddImage.isEnabled=true
-            btnAddPdf.isEnabled=true
+            btnAddPdf.isEnabled=false
             btnAddPdf.startAnimation(fromBottom)
             btnAddImage.startAnimation(fromBottom)
             btnAddAttachment.startAnimation(rotateOpen)
         }
         else
         {
-            btnAddPdf.visibility=View.INVISIBLE
             btnAddImage.visibility=View.INVISIBLE
             btnAddImage.isClickable=false
             btnAddPdf.isClickable=false
